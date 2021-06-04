@@ -1,19 +1,46 @@
+from turtle import color, fillcolor
 import folium
 import pandas
 from random import uniform
+from pathlib import Path
 
-datas = pandas.read_csv("Volcanoes.txt")
+data_dir=Path("data")
+output_dir=Path("output")
+html_dir=Path("html")
+popup_template = html_dir.joinpath("popup.html").read_text()
+datas = pandas.read_csv(data_dir.joinpath("Volcanoes.txt"))
 center = [41.795369, -112.692524]
+
+def map_color(elev: float) -> str:
+    if elev < 500:
+        return "#ccb93f"
+    elif elev < 1000:
+        return "#96cc3f"
+    elif elev < 1500:
+        return "#59cc3f"
+    elif elev < 2000:
+        return "#3fcc86"
+    elif elev < 2500:
+        return "#3fc5cc"
+    elif elev < 3000:
+        return "#3f67cc"
+    elif elev < 3500:
+        return "#693fcc"
+    else:
+        return "#ab3fcc"
+
 map = folium.Map(location=center, zoom_start=6, tiles="Stamen Terrain")
-popup_template = """<h4>Volcano Name:</h4>
-<a href="https://www.google.com/search?q=%22{name}%22" target="_blank">{name}</a><br>
-{elev}m
-"""
 feature_group = folium.FeatureGroup(name="My Map")
 for name, lat, lon, elev in zip(datas["NAME"], datas["LAT"], datas["LON"], datas["ELEV"]):
     point = [ lat, lon ]
     popup = folium.Popup(folium.IFrame(html=popup_template.format(name=name, elev=elev), width=200, height=100))
-    feature_group.add_child(folium.Marker(location=point, popup=popup, icon=folium.Icon(color="green")))
+    feature_group.add_child(folium.CircleMarker(location=point, 
+                                                popup=popup, 
+                                                radius=6,
+                                                color="#111111",
+                                                fill=True,
+                                                fill_color=map_color(elev),
+                                                fill_opacity=0.7))
 
 map.add_child(feature_group)
-map.save("map1.html")
+map.save(output_dir.joinpath("map1.html").__str__())
