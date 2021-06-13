@@ -5,11 +5,12 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Current File",
+            "name": "PopulationMapping",
             "type": "python",
             "request": "launch",
-            "program": "${file}",
-            "console": "integratedTerminal"
+            "program": "PopulationMapping/map1.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
         }
     ]
 }
